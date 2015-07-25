@@ -1,0 +1,47 @@
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  vars:
+    my_name: a_b_c
+    my_file: test.conf
+  tasks:
+    - debug: msg={{ my_name|replace('_', '-') }}
+
+# - lineinfile: dest=config regexp=^SELINUX= line=SELINUX=enforcing
+  tasks:
+  - name: create a complete empty file
+    command: touch test.conf
+              
+  - name: create a new file with lineinfile
+    lineinfile: dest=test.conf 
+                regexp='^' line=''
+                state=present
+                create=True
+ 
+  - name: add a string to the new file
+    lineinfile: dest=test.conf
+                regexp='^'
+                line='Hello, World!'
+                state=present 
+
+  - name: add SELINUX=disabled line to the new file
+    lineinfile: dest=test.conf
+                regexp='^SELINUX=disabled'
+                line='SELINUX=disabled'
+                state=present
+
+  - name: change SELINUX=disabled to SELINUX=enforcing in new file
+    lineinfile: dest=test.conf
+                regexp='^SELINUX=disabled'
+                line='SELINUX=enforcing'
+                state=present
+
+  - name: cat test.conf & display in debug msg
+    command: /bin/cat test.conf
+#    - shell: /usr/bin/uptime
+    register: result
+  - debug: var=result
+
+  - name: remove file test.conf
+    command: rm test.conf
+   
